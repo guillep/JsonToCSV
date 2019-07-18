@@ -1,3 +1,27 @@
+"
+I transform a Json to a CSV, first flattening the Json object using JSONFlattener.
+Examples:
+
+(JsonToCSV transformStream: (FileLocator documents / 'nlp4j.json') readStream) lines size.
+
+fileRef := FileLocator documents / 'nlp4j.json'.
+csvRef := fileRef withoutExtension , 'csv'.
+csvRef writeStreamDo: [ :writeStream |
+  fileRef readStreamDo: [ :readStream |
+    JsonToCSV new
+      inputStream: readStream;
+      outputStream: writeStream;
+      transform ] ].
+
+fileRef := FileLocator documents / 'joda-time.json'.
+csvRef := fileRef withoutExtension , 'csv'.
+csvRef writeStreamDo: [ :writeStream |
+  fileRef readStreamDo: [ :readStream |
+    JsonToCSV new
+      inputStream: readStream;
+      outputStream: writeStream;
+      transform ] ].
+"
 Class {
 	#name : #JsonToCSV,
 	#superclass : #Object,

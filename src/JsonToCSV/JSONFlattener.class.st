@@ -1,3 +1,28 @@
+"
+I flatten Json objects into records. Each field in a json object becomes a column in the record, where the field name is the column name. When there are nested objects, the column name is the path to arrive to the field. For example:
+
+{ ""x"": { ""y"": 7 } }
+
+=>
+
+x_y
+7
+
+Arrays have two main mapping strategies: 
+ - either each element in the array is mapped into a different field
+
+{ ""x"": [ 1,2,3 ] } =>
+x_1,x_2,x_3
+1,2,3
+
+ - or each element spawns a new record, making permutations
+
+{ ""x"": [ 1,2,3 ] } =>
+x
+1
+2
+3
+"
 Class {
 	#name : #JSONFlattener,
 	#superclass : #Object,
