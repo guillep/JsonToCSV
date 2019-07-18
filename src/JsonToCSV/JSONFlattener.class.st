@@ -106,7 +106,7 @@ JSONFlattener >> flattenJSONString: aJSONString parentName: aName [
 { #category : #initialization }
 JSONFlattener >> initialize [
 	super initialize.
-	denormalizeArrays := false
+	denormalizeArrays := true
 ]
 
 { #category : #arrays }

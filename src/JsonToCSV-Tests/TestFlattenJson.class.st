@@ -112,7 +112,7 @@ TestFlattenJson >> testFlattenNestedJSONArrayFlattensPropertiesUsingIndex [
 TestFlattenJson >> testFlattenNestedJSONArrayGeneratesSingleRecord [
 
 	| json flattened |
-	json := { 
+	json := {
 		'y' -> { 4. 5. 6. }.
 	} asDictionary.
 	
