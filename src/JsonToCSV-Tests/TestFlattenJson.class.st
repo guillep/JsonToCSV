@@ -53,6 +53,26 @@ TestFlattenJson >> testDoNotInlineNestedJSONArrayPreservesValues [
 	self assertProperty: 'y' of: flattened third equals: 6.
 ]
 
+{ #category : #'tests-array-denormalized' }
+TestFlattenJson >> testFieldsAreKeptInOrder [
+
+	| json flattened |
+	json := { 
+		'first' -> { 4. 5. 6. }.
+		'second' -> { 4. 5. 6. }.
+		'third' -> { 4. 5. 6. }.
+	} asOrderedDictionary.
+	
+	flattened := JSONFlattener new
+		denormalizeArrays: true;
+		flatten: json.
+	
+	flattened do: [ :each |
+		self assert: each keys first equals: 'first'.
+		self assert: each keys second equals: 'second'.
+		self assert: each keys third equals: 'third'  ]
+]
+
 { #category : #'tests-objects' }
 TestFlattenJson >> testFlattenComplexJSONObjectPreservesNonNestedProperties [
 
@@ -166,15 +186,15 @@ TestFlattenJson >> testFlattenSiblingArraysCombinesThem [
 		denormalizeArrays: true;
 		flatten: json.
 	
-	self assert: (flattened at: 1) equals: { 'x' -> 1 . 'y' -> 4 } asDictionary.
-	self assert: (flattened at: 2) equals: { 'x' -> 1 . 'y' -> 5 } asDictionary.
-	self assert: (flattened at: 3) equals: { 'x' -> 1 . 'y' -> 6 } asDictionary.
-	self assert: (flattened at: 4) equals: { 'x' -> 2 . 'y' -> 4 } asDictionary.
-	self assert: (flattened at: 5) equals: { 'x' -> 2 . 'y' -> 5 } asDictionary.
-	self assert: (flattened at: 6) equals: { 'x' -> 2 . 'y' -> 6 } asDictionary.
-	self assert: (flattened at: 7) equals: { 'x' -> 3 . 'y' -> 4 } asDictionary.
-	self assert: (flattened at: 8) equals: { 'x' -> 3 . 'y' -> 5 } asDictionary.
-	self assert: (flattened at: 9) equals: { 'x' -> 3 . 'y' -> 6 } asDictionary.
+	self assert: (flattened at: 1) equals: { 'x' -> 1 . 'y' -> 4 } asOrderedDictionary.
+	self assert: (flattened at: 2) equals: { 'x' -> 1 . 'y' -> 5 } asOrderedDictionary.
+	self assert: (flattened at: 3) equals: { 'x' -> 1 . 'y' -> 6 } asOrderedDictionary.
+	self assert: (flattened at: 4) equals: { 'x' -> 2 . 'y' -> 4 } asOrderedDictionary.
+	self assert: (flattened at: 5) equals: { 'x' -> 2 . 'y' -> 5 } asOrderedDictionary.
+	self assert: (flattened at: 6) equals: { 'x' -> 2 . 'y' -> 6 } asOrderedDictionary.
+	self assert: (flattened at: 7) equals: { 'x' -> 3 . 'y' -> 4 } asOrderedDictionary.
+	self assert: (flattened at: 8) equals: { 'x' -> 3 . 'y' -> 5 } asOrderedDictionary.
+	self assert: (flattened at: 9) equals: { 'x' -> 3 . 'y' -> 6 } asOrderedDictionary.
 
 ]
 

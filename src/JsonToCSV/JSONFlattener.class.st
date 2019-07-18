@@ -102,13 +102,13 @@ JSONFlattener >> flattenJSONObject: aJSONObject [
 JSONFlattener >> flattenJSONObject: aJSONObject parentName: parentName [
 
 	| result prefix |
-	result := {Dictionary new}.
+	result := { OrderedDictionary new}.
 	prefix := parentName ifNotEmpty: [ parentName , '_' ].
 	aJSONObject associationsDo: [ :association | | flattenedSubCollection |
 		flattenedSubCollection := self flatten: association value parentName: association key.
 		result := result flatCollect: [ :previousSubflatten |
 			flattenedSubCollection collect: [ :subflatten | | newSubflatten |
-				newSubflatten := Dictionary new.
+				newSubflatten := OrderedDictionary new.
 				newSubflatten addAll: previousSubflatten.
 				subflatten associationsDo: [ :each |
 					newSubflatten at: prefix, each key put: each value ].
@@ -138,7 +138,7 @@ JSONFlattener >> initialize [
 JSONFlattener >> inlineJSONArrayAsFields: anArray withParentName: aName [
 	
 	| result |
-	result := Dictionary new.
+	result := OrderedDictionary new.
 	anArray withIndexDo: [ :elem :index |
 		result at: index asString put: elem.
 	].

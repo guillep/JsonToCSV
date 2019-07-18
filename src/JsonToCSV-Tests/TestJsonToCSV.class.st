@@ -61,3 +61,16 @@ TestJsonToCSV >> testConvertObjectWithManyFields [
 1,true
 ' withUnixLineEndings 
 ]
+
+{ #category : #tests }
+TestJsonToCSV >> testConvertObjectWithNestedFieldsKeepsOrder [
+
+	| csv |
+	csv := JsonToCSV transformString: '{ "x": { "a": 1, "b": 2 }, "y": { "a": 3, "b": 4 } }'.
+	self 
+		assert: (csv withLineEndings: String lf)
+		equals: 
+'"x_a","x_b","y_a","y_b"
+1,2,3,4
+' withUnixLineEndings 
+]
