@@ -88,6 +88,23 @@ This library takes care of converting tree-like JSON structures and convert them
 "x","y_1","y_2","y_3"
 1,1,2,3
 ```
+## Usage
+
+```
+JsonToCSV transformStream: aReadStream.
+JsonToCSV transformString: '{"x":17}'.
+```
+
+To write the output to a file, you can just combine streams:
+
+```
+outputFileReference writeStreamDo: [ :writeStream |
+  inputFileReference readStreamDo: [ :readStream |
+    JsonToCSV new
+      inputStream: readStream;
+      outputStream: writeStream;
+      transform ] ]
+```
 
 ## Installation
 
@@ -99,8 +116,6 @@ Metacello new
   baseline: 'JsonToCSV';
   load.
 ```
-
-## Usage
 
 ## Licence
 
