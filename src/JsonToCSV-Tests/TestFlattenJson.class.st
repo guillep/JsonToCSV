@@ -21,7 +21,7 @@ TestFlattenJson >> assertProperty: aString of: aCollection equalsIn: aCollection
 		equals: (aCollection2 at: aString)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-array-denormalized' }
 TestFlattenJson >> testDoNotInlineNestedJSONArrayGeneratesOneElementPerArrayElement [
 
 	| json flattened |
@@ -30,13 +30,13 @@ TestFlattenJson >> testDoNotInlineNestedJSONArrayGeneratesOneElementPerArrayElem
 	} asDictionary.
 	
 	flattened := JSONFlattener new
-		inlineArrays: false;
+		denormalizeArrays: true;
 		flatten: json.
 	
 	self assert: flattened size equals: 3
 ]
 
-{ #category : #tests }
+{ #category : #'tests-array-denormalized' }
 TestFlattenJson >> testDoNotInlineNestedJSONArrayPreservesValues [
 
 	| json flattened |
@@ -45,7 +45,7 @@ TestFlattenJson >> testDoNotInlineNestedJSONArrayPreservesValues [
 	} asDictionary.
 	
 	flattened := JSONFlattener new
-		inlineArrays: false;
+		denormalizeArrays: true;
 		flatten: json.
 	
 	self assertProperty: 'y' of: flattened first equals: 4.
@@ -69,7 +69,7 @@ TestFlattenJson >> testFlattenComplexJSONObjectPreservesNonNestedProperties [
 	self assertProperty: 'x' of: flattened first equals: 1.
 ]
 
-{ #category : #'tests-arrays' }
+{ #category : #'tests-objects' }
 TestFlattenJson >> testFlattenEmptyJSONArrayIsEmpty [
 
 	| json flattened |
@@ -80,7 +80,7 @@ TestFlattenJson >> testFlattenEmptyJSONArrayIsEmpty [
 	self assert: flattened isEmpty.
 ]
 
-{ #category : #'tests-arrays' }
+{ #category : #'tests-objects' }
 TestFlattenJson >> testFlattenJSONArrayWithSingleElementHasSingleElement [
 
 	| json flattened |
@@ -91,7 +91,7 @@ TestFlattenJson >> testFlattenJSONArrayWithSingleElementHasSingleElement [
 	self assert: flattened size equals: 1.
 ]
 
-{ #category : #tests }
+{ #category : #'tests-arrays-normalized' }
 TestFlattenJson >> testFlattenNestedJSONArrayFlattensPropertiesUsingIndex [
 
 	| json flattened |
@@ -99,11 +99,28 @@ TestFlattenJson >> testFlattenNestedJSONArrayFlattensPropertiesUsingIndex [
 		'y' -> { 4. 5. 6. }.
 	} asDictionary.
 	
-	flattened := JSONFlattener flatten: json.
+	flattened := JSONFlattener new
+		denormalizeArrays: false;
+		flatten: json.
 	
 	self assertProperty: 'y_1' of: flattened first equals: 4.
 	self assertProperty: 'y_2' of: flattened first equals: 5.
 	self assertProperty: 'y_3' of: flattened first equals: 6.
+]
+
+{ #category : #'tests-arrays-normalized' }
+TestFlattenJson >> testFlattenNestedJSONArrayGeneratesSingleRecord [
+
+	| json flattened |
+	json := { 
+		'y' -> { 4. 5. 6. }.
+	} asDictionary.
+	
+	flattened := JSONFlattener new
+		denormalizeArrays: false;
+		flatten: json.
+	
+	self assert: flattened size equals: 1
 ]
 
 { #category : #'tests-objects' }
@@ -137,6 +154,31 @@ TestFlattenJson >> testFlattenNestedJSONObjectReturnsSingleItem [
 ]
 
 { #category : #'tests-objects' }
+TestFlattenJson >> testFlattenSiblingArraysCombinesThem [
+
+	| json flattened |
+	json := {
+		'x' -> {1. 2. 3}.
+		'y' -> {4. 5. 6}.
+	} asDictionary.
+	
+	flattened := JSONFlattener new
+		denormalizeArrays: true;
+		flatten: json.
+	
+	self assert: (flattened at: 1) equals: { 'x' -> 1 . 'y' -> 4 } asDictionary.
+	self assert: (flattened at: 2) equals: { 'x' -> 1 . 'y' -> 5 } asDictionary.
+	self assert: (flattened at: 3) equals: { 'x' -> 1 . 'y' -> 6 } asDictionary.
+	self assert: (flattened at: 4) equals: { 'x' -> 2 . 'y' -> 4 } asDictionary.
+	self assert: (flattened at: 5) equals: { 'x' -> 2 . 'y' -> 5 } asDictionary.
+	self assert: (flattened at: 6) equals: { 'x' -> 2 . 'y' -> 6 } asDictionary.
+	self assert: (flattened at: 7) equals: { 'x' -> 3 . 'y' -> 4 } asDictionary.
+	self assert: (flattened at: 8) equals: { 'x' -> 3 . 'y' -> 5 } asDictionary.
+	self assert: (flattened at: 9) equals: { 'x' -> 3 . 'y' -> 6 } asDictionary.
+
+]
+
+{ #category : #'tests-objects' }
 TestFlattenJson >> testFlattenSimpleJSONObjectReturnsSingleItem [
 
 	| json flattened |
@@ -150,7 +192,7 @@ TestFlattenJson >> testFlattenSimpleJSONObjectReturnsSingleItem [
 	self assert: flattened size equals: 1.
 ]
 
-{ #category : #'tests-arrays' }
+{ #category : #'tests-objects' }
 TestFlattenJson >> testFlattenedJSONObjectInArrayHasSamePropertiesAsOriginalObject [
 
 	| json flattened |

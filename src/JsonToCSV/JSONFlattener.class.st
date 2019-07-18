@@ -2,7 +2,7 @@ Class {
 	#name : #JSONFlattener,
 	#superclass : #Object,
 	#instVars : [
-		'inlineArrays'
+		'denormalizeArrays'
 	],
 	#category : #JsonToCSV
 }
@@ -13,8 +13,14 @@ JSONFlattener class >> flatten: aJSON [
 	^ self new flatten: aJSON
 ]
 
+{ #category : #accessing }
+JSONFlattener >> denormalizeArrays: aBoolean [
+	
+	denormalizeArrays := aBoolean
+]
+
 { #category : #arrays }
-JSONFlattener >> expandJSONArray: anArray withParentName: aName [
+JSONFlattener >> expandJSONArrayAsRecords: anArray withParentName: aName [
 
 	^ anArray flatCollect: [ :each |
 		self flatten: each parentName: aName ]
@@ -43,10 +49,10 @@ JSONFlattener >> flattenJSONArray: anArray parentName: aName [
 	
 	anArray ifEmpty: [ ^ anArray ].
 
-	inlineArrays ifTrue: [ 
-		^ self inlineJSONArray: anArray withParentName: aName ].
+	denormalizeArrays ifTrue: [ 
+		^ self expandJSONArrayAsRecords: anArray withParentName: aName].
 	
-	^ self expandJSONArray: anArray withParentName: aName
+	^ self inlineJSONArrayAsFields: anArray withParentName: aName
 ]
 
 { #category : #flattening }
@@ -75,8 +81,8 @@ JSONFlattener >> flattenJSONObject: aJSONObject parentName: parentName [
 	prefix := parentName ifNotEmpty: [ parentName , '_' ].
 	aJSONObject associationsDo: [ :association | | flattenedSubCollection |
 		flattenedSubCollection := self flatten: association value parentName: association key.
-		result := flattenedSubCollection flatCollect: [ :subflatten |
-			result collect: [ :previousSubflatten | | newSubflatten |
+		result := result flatCollect: [ :previousSubflatten |
+			flattenedSubCollection collect: [ :subflatten | | newSubflatten |
 				newSubflatten := Dictionary new.
 				newSubflatten addAll: previousSubflatten.
 				subflatten associationsDo: [ :each |
@@ -100,17 +106,11 @@ JSONFlattener >> flattenJSONString: aJSONString parentName: aName [
 { #category : #initialization }
 JSONFlattener >> initialize [
 	super initialize.
-	inlineArrays := true
+	denormalizeArrays := false
 ]
 
-{ #category : #accessing }
-JSONFlattener >> inlineArrays: aBoolean [
-	
-	inlineArrays := aBoolean
-]
-
-{ #category : #flattening }
-JSONFlattener >> inlineJSONArray: anArray withParentName: aName [
+{ #category : #arrays }
+JSONFlattener >> inlineJSONArrayAsFields: anArray withParentName: aName [
 	
 	| result |
 	result := Dictionary new.
